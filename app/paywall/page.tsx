@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { ShieldCheck, Lock, ArrowRight, Zap, Terminal } from "lucide-react";
@@ -138,10 +138,10 @@ export default function Paywall() {
           <div className="text-[10px] text-neonMint font-bold uppercase tracking-widest mb-2 flex items-center gap-1">
             <Zap className="w-3.5 h-3.5" /> WHAT YOU UNLOCK
           </div>
-          <p className="text-gray-300">� Exact Eye Canthal Tilt & Periororbital Assessment</p>
-          <p className="text-gray-300">� Jawline Gonial Angle & Chin Projection Ratio</p>
-          <p className="text-gray-300">� 72-Hour Facial Debloating & Sodium Flush Protocol</p>
-          <p className="text-gray-300">� Custom Haircut & Grooming Guide for your Face Shape</p>
+          <p className="text-gray-300">ï¿½ Exact Eye Canthal Tilt & Periororbital Assessment</p>
+          <p className="text-gray-300">ï¿½ Jawline Gonial Angle & Chin Projection Ratio</p>
+          <p className="text-gray-300">ï¿½ 72-Hour Facial Debloating & Sodium Flush Protocol</p>
+          <p className="text-gray-300">ï¿½ Custom Haircut & Grooming Guide for your Face Shape</p>
         </div>
 
       </div>
