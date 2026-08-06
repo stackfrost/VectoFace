@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-white antialiased font-mono selection:bg-neonMint selection:text-black;
+    overscroll-behavior-y: none;
+  }
+}
+
+/* Cyberpunk Glass Panel with Light Bleed */
+.cyber-panel {
+  @apply bg-surface/90 border border-surfaceBorder rounded-none relative overflow-hidden;
+  box-shadow: 0 0 30px -10px rgba(176, 38, 255, 0.15), inset 0 0 15px rgba(0, 255, 135, 0.05);
+}
+
+.cyber-panel-mint {
+  @apply bg-surface/90 border border-neonMint/40 rounded-none relative overflow-hidden;
+  box-shadow: 0 0 30px -5px rgba(0, 255, 135, 0.25), inset 0 0 20px rgba(0, 255, 135, 0.1);
+}
+
+.cyber-panel-violet {
+  @apply bg-surface/90 border border-neonViolet/40 rounded-none relative overflow-hidden;
+  box-shadow: 0 0 30px -5px rgba(176, 38, 255, 0.25), inset 0 0 20px rgba(176, 38, 255, 0.1);
+}
+
+/* Tactical Corner Crosshairs for Cards */
+.tactical-corners::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #00FF87;
+  border-left: 2px solid #00FF87;
+}
+
+.tactical-corners::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  border-bottom: 2px solid #B026FF;
+  border-right: 2px solid #B026FF;
+}
+
+/* Subtle CRT Scanline overlay effect */
+.crt-overlay {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  );
+  background-size: 100% 4px;
+}

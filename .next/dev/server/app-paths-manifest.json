@@ -1,0 +1,6 @@
+{
+  "/contact/page": "app/contact/page.js",
+  "/free-report/page": "app/free-report/page.js",
+  "/refund-policy/page": "app/refund-policy/page.js",
+  "/terms/page": "app/terms/page.js"
+}

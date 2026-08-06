@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// 1. Meme Page Admin / Affiliate Account
+model Affiliate {
+  id              String       @id @default(cuid())
+  refCode         String       @unique // e.g., "SIGMA_MEMES"
+  adminName       String       // e.g., "Rahul / @sigma_edits_7"
+  upiId           String       // Payout address
+  totalSalesCount Int          @default(0)
+  unpaidBalance   Float        @default(0.0)
+  totalPaid       Float        @default(0.0)
+  createdAt       DateTime     @default(now())
+
+  conversions     Conversion[]
+}
+
+// 2. Individual Conversion Record
+model Conversion {
+  id                String     @id @default(cuid())
+  affiliateId       String?
+  affiliate         Affiliate? @relation(fields: [affiliateId], references: [id])
+  razorpayOrderId   String     @unique
+  razorpayPaymentId String?    @unique
+  saleAmount        Float      
+  commissionEarned  Float      
+  status            String     @default("SUCCESS")
+  createdAt         DateTime   @default(now())
+}
+
+// 3. User Scan Report Storage
+model UserReport {
+  id           String   @id @default(cuid())
+  deviceId     String   
+  overallScore Float
+  tierLabel    String   
+  scoresJson   Json     
+  paid         Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
