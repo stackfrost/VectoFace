@@ -1,24 +1,40 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import "./globals.css";
-import Footer from "@/components/footer";
 
 export const metadata: Metadata = {
-  title: "MogCheck AI | Brutal Biometric Ratings",
-  description: "0% Cope. 100% On-Device Facial Aesthetics Analysis",
+  title: "VectoFace AI - Facial Structure & Aesthetics Analysis",
+  description: "AI-powered facial harmony and aesthetics analysis.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="bg-background text-white antialiased min-h-screen flex flex-col justify-between" suppressHydrationWarning>
-        <div className="flex-1">
-          {children}
-        </div>
-        <Footer />
+    <html lang="en">
+      <body className="bg-black text-white antialiased">
+        {/* VectoFace AI Header Ribbon */}
+        <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/80 backdrop-blur-md">
+          <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+            {/* Wordmark Brand */}
+            <Link href="/" className="group flex items-center">
+              <span className="font-extrabold text-xl tracking-tight text-white group-hover:text-cyan-400 transition-colors">
+                VectoFace <span className="text-cyan-400">AI</span>
+              </span>
+            </Link>
+
+            {/* Status Badge */}
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-zinc-300">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              Pro Engine V2.0
+            </div>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <main>{children}</main>
       </body>
     </html>
   );
