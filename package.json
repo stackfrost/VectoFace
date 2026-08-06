@@ -10,12 +10,14 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "clsx": "^2.1.1",
     "framer-motion": "^11.18.2",
     "jose": "^6.2.8",
     "lucide-react": "^0.344.0",
     "next": "^16.3.0",
+    "pg": "^8.22.0",
     "razorpay": "^2.9.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -23,6 +25,7 @@
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/pg": "^8.20.4",
     "@types/react": "^18",
     "autoprefixer": "^10.0.1",
     "postcss": "^8",
