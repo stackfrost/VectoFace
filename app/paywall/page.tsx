@@ -1,165 +1,106 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
-import { ShieldCheck, Lock, ArrowRight, Zap, Terminal } from "lucide-react";
+import Link from "next/link";
 
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
-
-export default function Paywall() {
-  const [refCode, setRefCode] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedRef = localStorage.getItem("mog_ref_code");
-      if (storedRef) {
-        setRefCode(storedRef);
-      }
-    }
-
-    // Load Razorpay Checkout Script dynamically
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    document.body.appendChild(script);
-  }, []);
-
-  const handlePayment = async () => {
-    setLoading(true);
-
-    try {
-      // 1. Request Order ID from backend (server-enforced price)
-      const orderRes = await fetch("/api/razorpay/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refCode }),
-      });
-
-      const orderData = await orderRes.json();
-
-      if (!orderData.success) {
-        alert("Failed to initialize checkout. Please try again.");
-        setLoading(false);
-        return;
-      }
-
-      // 2. Open Razorpay Modal
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: orderData.amount,
-        currency: orderData.currency,
-        name: "MogCheck AI",
-        description: "Full Diagnostic Aesthetic Report",
-        order_id: orderData.orderId,
-        handler: async function (response: any) {
-          // 3. Verify Payment on backend
-          const verifyRes = await fetch("/api/razorpay/verify", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              refCode,
-            }),
-          });
-
-          const verifyData = await verifyRes.json();
-
-          if (verifyData.success) {
-            window.location.href = "/full-report";
-          } else {
-            alert("Payment verification failed. Please contact support.");
-          }
-        },
-        prefill: {},
-        theme: {
-          color: "#00FF87",
-        },
-      };
-
-      const paymentObject = new window.Razorpay(options);
-      paymentObject.open();
-    } catch (err) {
-      console.error("Payment error:", err);
-      alert("Payment error occurred.");
-    } finally {
-      setLoading(false);
-    }
+export default function PaywallPage() {
+  const handleRazorpayPayment = () => {
+    // Replace with your Razorpay payment modal invocation
+    alert("Triggering Razorpay Checkout Modal...");
   };
 
-  const isDiscounted = Boolean(refCode);
-  const displayPrice = isDiscounted ? "?59" : "?149";
-
   return (
-    <main className="max-w-md mx-auto min-h-[100dvh] bg-background text-white flex flex-col justify-between p-6 font-mono crt-overlay relative overflow-hidden">
-      
-      {/* Background Orbs */}
-      <div className="absolute top-[-10%] right-[-10%] w-[120%] h-[35%] bg-neonMint/20 blur-[100px] pointer-events-none" />
-
-      <div className="z-10 space-y-6">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-surfaceBorder pb-3">
-          <div className="inline-flex items-center gap-1.5 text-[10px] text-neonMint font-bold uppercase tracking-widest">
-            <Terminal className="w-3.5 h-3.5" /> CHECKOUT CONFIRMATION
-          </div>
-          <span className="text-[10px] text-gray-500 uppercase">256-BIT ENCRYPTED</span>
-        </div>
-
-        {/* Pricing Box */}
-        <div className="cyber-panel p-6 text-center tactical-corners border-neonMint relative">
-          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-            UNLOCK FULL DIAGNOSTIC & SOFT-MAXXING GUIDE
+    <div className="max-w-2xl mx-auto px-6 py-10 md:py-14 space-y-8">
+      {/* Header Status */}
+      <div className="flex items-center justify-between border-b border-zinc-900 pb-5">
+        <div>
+          <span className="text-xs font-mono text-purple-400">
+            Report ID #VF-8821
           </span>
+          <h1 className="text-xl font-medium text-zinc-100">
+            Facial Structure Diagnostic
+          </h1>
+        </div>
+        <div className="px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-[11px] font-mono text-zinc-400">
+          Status: Ready
+        </div>
+      </div>
 
-          <div className="mt-3 flex items-center justify-center gap-3">
-            {isDiscounted && (
-              <span className="text-xl text-gray-500 line-through font-bold">?149</span>
-            )}
-            <span className="text-5xl font-black text-neonMint tracking-tight">
-              {displayPrice}
-            </span>
+      {/* Blurred Preview Card */}
+      <div className="relative p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 backdrop-blur-md overflow-hidden space-y-6">
+        {/* Unlocked Summary Metrics */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
+            <div className="text-[11px] font-mono text-zinc-400">Symmetry Score</div>
+            <div className="text-2xl font-semibold text-zinc-100 mt-1">88.4 / 100</div>
           </div>
+          <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
+            <div className="text-[11px] font-mono text-zinc-400">Facial Thirds Ratio</div>
+            <div className="text-2xl font-semibold text-zinc-100 mt-1">1 : 1.05 : 0.98</div>
+          </div>
+        </div>
 
-          {refCode && (
-            <div className="mt-3 inline-block bg-neonViolet/20 border border-neonViolet px-3 py-1 text-[10px] text-neonViolet font-bold uppercase tracking-widest">
-              PROMO APPLIED: {refCode} (SAVE ?90)
+        {/* Locked Detailed Section (Blurred Preview) */}
+        <div className="relative pt-2 space-y-3 select-none">
+          <div className="filter blur-md opacity-40 space-y-3">
+            <div className="p-3 bg-zinc-950 rounded-lg">
+              Canthal Tilt: Positive (3.2 degrees)
             </div>
-          )}
-        </div>
-
-        {/* Features Checklist */}
-        <div className="space-y-3 bg-surface/60 border border-surfaceBorder p-4 text-xs">
-          <div className="text-[10px] text-neonMint font-bold uppercase tracking-widest mb-2 flex items-center gap-1">
-            <Zap className="w-3.5 h-3.5" /> WHAT YOU UNLOCK
+            <div className="p-3 bg-zinc-950 rounded-lg">
+              Midface Compactness: Optimal Range
+            </div>
+            <div className="p-3 bg-zinc-950 rounded-lg">
+              Jawline Definition & Gonial Angle Analysis
+            </div>
           </div>
-          <p className="text-gray-300">ï¿½ Exact Eye Canthal Tilt & Periororbital Assessment</p>
-          <p className="text-gray-300">ï¿½ Jawline Gonial Angle & Chin Projection Ratio</p>
-          <p className="text-gray-300">ï¿½ 72-Hour Facial Debloating & Sodium Flush Protocol</p>
-          <p className="text-gray-300">ï¿½ Custom Haircut & Grooming Guide for your Face Shape</p>
-        </div>
 
+          {/* Paywall Overlay Banner */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-zinc-950/80 backdrop-blur-sm rounded-xl border border-zinc-800">
+            <div className="w-8 h-8 rounded-full bg-purple-500/10 border border-purple-500/30 flex items-center justify-center mb-3">
+              <svg
+                className="w-4 h-4 text-purple-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-base font-medium text-zinc-100">
+              Unlock Full Biometric Report
+            </h3>
+            <p className="text-xs text-zinc-400 font-light max-w-sm mt-1">
+              Includes comprehensive landmark coordinates, personalized grooming recommendations, and structural breakdown.
+            </p>
+
+            <div className="mt-5 w-full max-w-xs space-y-2">
+              <button
+                onClick={handleRazorpayPayment}
+                className="w-full py-3 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs transition-all shadow-sm active:scale-95"
+              >
+                Unlock Report — ₹99
+              </button>
+              <div className="text-[10px] font-mono text-zinc-400">
+                One-time payment • Secure Razorpay Checkout
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Unlock Button */}
-      <div className="z-10 pt-4 pb-2">
-        <button
-          onClick={handlePayment}
-          disabled={loading}
-          className="w-full bg-neonMint text-black font-black text-base py-4 uppercase tracking-wider active:scale-95 transition-transform flex items-center justify-center gap-2 shadow-glow-mint hover:bg-neonMint/90 disabled:opacity-50"
+      {/* Return Link */}
+      <div className="text-center">
+        <Link
+          href="/free-report"
+          className="text-xs font-mono text-zinc-400 hover:text-zinc-200 transition-colors"
         >
-          {loading ? "INITIALIZING..." : `PAY ${displayPrice} & UNLOCK`} <ArrowRight className="w-5 h-5" />
-        </button>
-        <div className="flex items-center justify-center gap-1.5 text-[10px] text-gray-500 uppercase mt-2">
-          <ShieldCheck className="w-3.5 h-3.5 text-neonMint" /> Instant Unlocking // Razorpay Secured
-        </div>
+          ← Upload a different photo
+        </Link>
       </div>
-
-    </main>
+    </div>
   );
 }

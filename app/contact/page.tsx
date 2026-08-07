@@ -1,28 +1,44 @@
-export default function ContactUs() {
+export default function ContactPage() {
   return (
-    <main className="max-w-2xl mx-auto p-6 text-gray-300 font-mono text-xs space-y-4 crt-overlay min-h-[100dvh]">
-      <h1 className="text-xl font-bold text-neonMint uppercase">Contact Us // Grievance Redressal</h1>
-      <p className="text-gray-400">Last updated: August 2026</p>
+    <div className="max-w-3xl mx-auto px-6 py-16 md:py-24 space-y-8">
+      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-panel-purple text-xs font-mono text-purple-300">
+        Support
+      </div>
       
-      <section className="space-y-2 border-t border-surfaceBorder pt-3">
-        <h2 className="text-sm font-bold text-white uppercase">Customer Support</h2>
-        <p>For questions regarding your diagnostic report, payment issues, or affiliate accounts:</p>
-        <p>Support Email: <code className="text-neonMint">support@vectoface.site</code></p>
-        <p>Operational Hours: Mon - Fri (10:00 AM - 6:00 PM IST)</p>
-      </section>
+      <h1 className="text-3xl md:text-4xl font-medium tracking-tight text-white">
+        Contact Us
+      </h1>
+      
+      <div className="space-y-8 text-sm text-zinc-300 leading-relaxed font-light glass-panel p-8 rounded-2xl">
+        <section className="space-y-4">
+          <p className="text-zinc-400">
+            We are here to help. If you experienced a technical issue, have questions about your biometric report, or need assistance with a payment, please reach out to our support team.
+          </p>
 
-      <section className="space-y-2 border-t border-surfaceBorder pt-3">
-        <h2 className="text-sm font-bold text-white uppercase">Data Protection Grievance Officer</h2>
-        <p>In accordance with the Digital Personal Data Protection Act 2023:</p>
-        <p>Grievance Officer: <strong className="text-white">Data Protection Desk</strong></p>
-        <p>Contact Email: <code className="text-neonMint">grievance@vectoface.site</code></p>
-      </section>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+            <div className="p-5 rounded-xl glass-panel-purple space-y-2">
+              <div className="text-xs font-mono text-purple-400 uppercase tracking-wider">Email Support</div>
+              <a href="mailto:support@vectoface.vercel.app" className="block text-lg font-medium text-white hover:text-emerald-400 transition-colors">
+                support@vectoface.com
+              </a>
+              <p className="text-xs text-zinc-500">We typically respond within 24-48 hours.</p>
+            </div>
 
-      <section className="space-y-2 border-t border-surfaceBorder pt-3">
-        <h2 className="text-sm font-bold text-white uppercase">Corporate Location</h2>
-        <p>Entity Name: <strong className="text-white">VectoFace AI</strong></p>
-        <p>Location: <strong className="text-white">Mumbai, Maharashtra, India - 400001</strong></p>
-      </section>
-    </main>
+            <div className="p-5 rounded-xl glass-panel space-y-2">
+              <div className="text-xs font-mono text-emerald-400 uppercase tracking-wider">Business Details</div>
+              <div className="text-base font-medium text-white">VectoFace AI</div>
+              <p className="text-xs text-zinc-500">Operating digitally across India.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-2 pt-4 border-t border-white/5">
+          <h2 className="text-lg font-medium text-white">Payment Issues?</h2>
+          <p className="text-zinc-400">
+            If you were charged but did not receive access to your report, please email us immediately with your <strong>Razorpay Payment ID</strong> (starts with `pay_`) and the email address used during checkout.
+          </p>
+        </section>
+      </div>
+    </div>
   );
 }

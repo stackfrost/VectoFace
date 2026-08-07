@@ -1,140 +1,154 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Lock, Zap, ArrowRight, ShieldAlert, Terminal } from "lucide-react";
+import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-interface GeminiReport {
-  overallScore: number;
-  tierLabel: string;
-  canthalTilt: string;
-  facialAdiposity: string;
-  unlockedObservations: string[];
-}
+export default function UploadPage() {
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [hasConsented, setHasConsented] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
-export default function FreeReport() {
-  const [report, setReport] = useState<GeminiReport | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Read Gemini analysis output saved by MobileScanner
-    const savedData = localStorage.getItem("mog_report_data");
-    if (savedData) {
-      try {
-        setReport(JSON.parse(savedData));
-      } catch (e) {
-        console.error("Failed to parse report data", e);
-      }
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0];
+    if (selected) {
+      setFile(selected);
+      setPreview(URL.createObjectURL(selected));
     }
-    setLoading(false);
-  }, []);
+  };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background text-white flex items-center justify-center font-mono crt-overlay">
-        <div className="text-center space-y-3">
-          <Terminal className="w-8 h-8 text-neonMint animate-spin mx-auto" />
-          <p className="text-xs text-neonMint uppercase tracking-widest">[ READING DIAGNOSTICS... ]</p>
-        </div>
-      </div>
-    );
-  }
+  const handleAnalyze = async () => {
+    if (!file || !hasConsented) return;
+    setIsScanning(true);
 
-  // Fallback defaults if accessed directly without scanning
-  const score = report?.overallScore ?? 4.8;
-  const tier = report?.tierLabel ?? "LTN / SUB-5";
-  const observations = report?.unlockedObservations ?? [
-    "Neutral canthal tilt creates slight tired eye appearance",
-    "High facial adiposity hiding midface bone structure"
-  ];
+    // Simulated scan transition - swap with your actual API endpoint upload later
+    setTimeout(() => {
+      setIsScanning(false);
+      router.push("/paywall");
+    }, 2500);
+  };
 
   return (
-    <main className="max-w-md mx-auto min-h-[100dvh] bg-background text-white flex flex-col justify-between p-6 font-mono crt-overlay relative overflow-hidden">
-      
-      {/* Background Glow Orbs */}
-      <div className="absolute top-[-10%] right-[-10%] w-[120%] h-[35%] bg-neonViolet/20 blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-[-5%] left-[-10%] w-[120%] h-[35%] bg-neonMint/15 blur-[100px] pointer-events-none" />
-
-      <div className="z-10 space-y-6">
-        
-        {/* Header Badge */}
-        <div className="flex items-center justify-between border-b border-surfaceBorder pb-3">
-          <div className="inline-flex items-center gap-1.5 text-[10px] text-neonViolet font-bold uppercase tracking-widest">
-            <Terminal className="w-3.5 h-3.5" /> GEMINI DIAGNOSTIC PREVIEW
-          </div>
-          <span className="text-[10px] text-gray-500 uppercase">CONFIDENTIAL // AI SCAN</span>
+    <div className="max-w-xl mx-auto px-6 py-12 md:py-16">
+      <div className="text-center space-y-3 mb-8">
+        <div className="inline-flex items-center px-2.5 py-0.5 rounded-full glass-panel-purple text-[11px] font-mono text-purple-300">
+          Step 01 / Photo Upload
         </div>
+        <h1 className="text-2xl md:text-3xl font-medium tracking-tight text-zinc-100">
+          Upload Frontal Portrait
+        </h1>
+        <p className="text-xs md:text-sm text-zinc-400 font-light">
+          Ensure good lighting, neutral facial expression, and no heavy filters.
+        </p>
+      </div>
 
-        {/* Tier & Overall Rating Hero */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="cyber-panel p-6 text-center tactical-corners border-neonMint/40 relative"
-        >
-          <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">
-            ESTIMATED TIER CLASSIFICATION
+      {/* Main Upload / Preview Box */}
+      <div
+        onClick={() => fileInputRef.current?.click()}
+        className="relative border border-dashed border-white/10 rounded-2xl glass-panel hover:bg-[#121216]/80 hover:border-purple-500/40 transition-all cursor-pointer p-8 flex flex-col items-center justify-center min-h-[320px] overflow-hidden group"
+      >
+        {/* Added capture="user" to prioritize mobile front camera */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          capture="user"
+          onChange={handleFileSelect}
+          className="hidden"
+        />
+
+        {preview ? (
+          <div className="relative w-full h-64 rounded-xl overflow-hidden border border-white/10">
+            {/* eslint-disable-next-next/no-img-element */}
+            <img
+              src={preview}
+              alt="Scan Preview"
+              className="w-full h-full object-cover"
+            />
+            {isScanning && (
+              <div className="absolute inset-0 bg-[#08080a]/80 backdrop-blur-md flex flex-col items-center justify-center space-y-3">
+                <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping shadow-[0_0_10px_#a855f7]" />
+                <span className="text-xs font-mono text-zinc-200">
+                  Mapping 68 Landmark Vector Coordinates...
+                </span>
+              </div>
+            )}
           </div>
-          
-          <h1 className="text-4xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-neonMint via-white to-neonViolet uppercase">
-            {tier}
-          </h1>
-
-          <div className="mt-3 inline-block bg-black/80 border border-neonMint/50 px-3 py-1 text-xs text-neonMint font-bold tracking-widest uppercase shadow-glow-mint">
-            AESTHETIC RATING: {score} / 10
-          </div>
-        </motion.div>
-
-        {/* Free Teaser Observations */}
-        <div className="space-y-3">
-          <div className="text-[10px] text-neonViolet font-bold uppercase tracking-widest flex items-center gap-1">
-            <Zap className="w-3.5 h-3.5" /> UNLOCKED INITIAL OBSERVATIONS
-          </div>
-
-          <div className="bg-surface/60 border border-surfaceBorder p-3 text-xs space-y-2">
-            {observations.map((obs, idx) => (
-              <p key={idx} className="text-gray-300">
-                • <strong className="text-white">{obs}</strong>
+        ) : (
+          <div className="text-center space-y-4">
+            <div className="w-12 h-12 rounded-full glass-panel flex items-center justify-center mx-auto group-hover:border-purple-500/40 transition-colors">
+              <svg
+                className="w-5 h-5 text-zinc-400 group-hover:text-purple-400 transition-colors"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-zinc-200">
+                Click to open camera or gallery
               </p>
-            ))}
+              <p className="text-xs text-zinc-400 font-mono">
+                PNG, JPG, WEBP up to 10MB
+              </p>
+            </div>
           </div>
-        </div>
-
-        {/* Paywall Preview / Locked Content */}
-        <div className="relative cyber-panel p-4 tactical-corners border-neonViolet/30 overflow-hidden">
-          <div className="text-[10px] text-alertRed font-bold uppercase tracking-widest flex items-center gap-1 mb-2">
-            <ShieldAlert className="w-3.5 h-3.5" /> LOCKED HIGH-IMPACT METRICS
-          </div>
-
-          {/* Blurred Dummy Content */}
-          <div className="filter blur-sm select-none opacity-40 space-y-2 text-xs">
-            <p>• Jawline Gonial Angle & Chin Projection Ratio</p>
-            <p>• Midface Ratio & FWHR (Facial Width-to-Height)</p>
-            <p>• Customized Maxilla & Sodium Debloating Protocol</p>
-            <p>• Haircut & Soft-Maxxing recommendations for your face shape</p>
-          </div>
-
-          {/* Overlay Lock Banner */}
-          <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center p-4 text-center">
-            <Lock className="w-6 h-6 text-neonMint mb-1 animate-bounce" />
-            <span className="text-xs font-bold text-white uppercase tracking-wider">FULL DIAGNOSTIC & PROTOCOL LOCKED</span>
-            <span className="text-[10px] text-gray-400 mt-0.5">Unlock exact angles, softmaxxing guide & priority checklist</span>
-          </div>
-        </div>
-
+        )}
       </div>
 
-      {/* CTA Button */}
-      <div className="z-10 pt-4 pb-2">
-        <button
-          onClick={() => {
-            alert("Razorpay integration is paused. Scan functionality verified successfully!");
-          }}
-          className="w-full bg-neonMint text-black font-black text-base py-4 uppercase tracking-wider active:scale-95 transition-transform flex items-center justify-center gap-2 shadow-glow-mint hover:bg-neonMint/90"
-        >
-          UNLOCK FULL REPORT — ₹59 <ArrowRight className="w-5 h-5" />
-        </button>
-      </div>
+      {/* Action CTA & Consent */}
+      <div className="mt-8 flex flex-col gap-5">
+        
+        {/* Explicit Consent Checkbox */}
+        <label className="flex items-start gap-3 cursor-pointer group px-2">
+          <div className="relative flex items-center justify-center mt-0.5">
+            <input
+              type="checkbox"
+              checked={hasConsented}
+              onChange={(e) => setHasConsented(e.target.checked)}
+              className="peer appearance-none w-4 h-4 rounded-sm border border-zinc-600 bg-zinc-900/50 checked:bg-purple-600 checked:border-purple-500 transition-all cursor-pointer"
+            />
+            <svg
+              className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={3}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <span className="text-xs text-zinc-400 font-light leading-relaxed">
+            I confirm this is my photo, and I agree to the{" "}
+            <Link href="/terms" className="text-purple-400 hover:underline">Terms</Link> and{" "}
+            <Link href="/privacy" className="text-purple-400 hover:underline">Privacy Policy</Link>. I understand images are processed ephemerally and immediately deleted.
+          </span>
+        </label>
 
-    </main>
+        {/* Scan Button */}
+        <div className="flex flex-col items-center gap-3">
+          <button
+            onClick={handleAnalyze}
+            disabled={!file || !hasConsented || isScanning}
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-emerald-500 hover:opacity-90 disabled:opacity-40 disabled:hover:opacity-40 disabled:from-zinc-800 disabled:to-zinc-800 disabled:text-zinc-500 text-white font-semibold text-sm transition-all shadow-[0_0_15px_rgba(168,85,247,0.2)] active:scale-[0.99]"
+          >
+            {isScanning ? "Analyzing Facial Geometry..." : "Run Biometric Analysis"}
+          </button>
+          <span className="text-[11px] font-mono text-zinc-500">
+            End-to-End Encrypted
+          </span>
+        </div>
+      </div>
+    </div>
   );
 }

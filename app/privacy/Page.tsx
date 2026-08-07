@@ -1,39 +1,53 @@
-export default function PrivacyPolicy() {
+import Link from "next/link";
+
+export default function PrivacyPage() {
   return (
-    <main className="max-w-2xl mx-auto p-6 text-gray-300 font-mono text-xs space-y-4 crt-overlay min-h-[100dvh]">
-      <h1 className="text-xl font-bold text-neonMint uppercase">Privacy Policy // VectoFace AI</h1>
-      <p className="text-gray-400">Last updated: August 2026</p>
+    <div className="max-w-3xl mx-auto px-6 py-16 md:py-24 space-y-8">
+      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-panel-purple text-xs font-mono text-purple-300">
+        Legal & Compliance
+      </div>
+      
+      <h1 className="text-3xl md:text-4xl font-medium tracking-tight text-white">
+        Privacy Policy
+      </h1>
+      
+      <div className="space-y-8 text-sm text-zinc-300 leading-relaxed font-light glass-panel p-8 rounded-2xl">
+        <section className="space-y-2">
+          <h2 className="text-lg font-medium text-white">1. Introduction</h2>
+          <p className="text-zinc-400">
+            Welcome to VectoFace AI. We prioritize your privacy and are committed to protecting your personal information while providing advanced facial structural analytics.
+          </p>
+        </section>
 
-      <section className="space-y-2 border-t border-surfaceBorder pt-3">
-        <h2 className="text-sm font-bold text-white uppercase">1. Image Data Processing & Cloud Transmission</h2>
-        <p>
-          When you submit a photo, your image is securely transmitted via 256-bit SSL encryption to our AI engine endpoints for real-time inference.
-        </p>
-        <p>
-          <strong>Ephemeral Memory Processing:</strong> Images are processed transiently in volatile RAM strictly for computing facial metrics (symmetry, adiposity, and structural ratios). <strong>VectoFace AI does not retain, store on disk, or sell uploaded selfie images.</strong>
-        </p>
-      </section>
+        <section className="space-y-2">
+          <h2 className="text-lg font-medium text-purple-400">2. Image Processing & Biometric Data</h2>
+          <p className="text-zinc-400">
+            When you upload a photo for analysis, the image is processed ephemerally on secure servers to map 68 facial landmarks and calculate geometric ratios. 
+            <strong className="text-zinc-200"> Images are deleted immediately after your diagnostic report is generated. We do not store your photos, nor do we extract, store, sell, or share biometric identification data.</strong>
+          </p>
+        </section>
 
-      <section className="space-y-2 border-t border-surfaceBorder pt-3">
-        <h2 className="text-sm font-bold text-white uppercase">2. Age Requirement & Consent</h2>
-        <p>
-          Our services are intended strictly for users who are 18 years of age or older. By uploading a photo, you explicitly confirm that you meet this age requirement and consent to real-time metric analysis.
-        </p>
-      </section>
+        <section className="space-y-2">
+          <h2 className="text-lg font-medium text-white">3. Payment Information</h2>
+          <p className="text-zinc-400">
+            All payments are securely processed through Razorpay. VectoFace AI does not store your credit card details, UPI IDs, or banking information on our servers.
+          </p>
+        </section>
 
-      <section className="space-y-2 border-t border-surfaceBorder pt-3">
-        <h2 className="text-sm font-bold text-white uppercase">3. Third-Party AI Subprocessors</h2>
-        <p>
-          Image evaluations are performed using Google Gemini Vision API infrastructure. Data transmitted is used strictly for generating your requested report and is governed by strict enterprise privacy standards preventing model training on user inputs.
-        </p>
-      </section>
+        <section className="space-y-2">
+          <h2 className="text-lg font-medium text-white">4. Cookies & Tracking</h2>
+          <p className="text-zinc-400">
+            We use strictly necessary cookies to manage your unlocked reports and maintain secure sessions. We do not use intrusive third-party tracking cookies.
+          </p>
+        </section>
 
-      <section className="space-y-2 border-t border-surfaceBorder pt-3">
-        <h2 className="text-sm font-bold text-white uppercase">4. Contact & Support</h2>
-        <p>
-          For privacy inquiries or data rights requests, contact our Data Protection Desk at <code className="text-neonMint">grievance@vectoface.site</code>.
-        </p>
-      </section>
-    </main>
+        <section className="space-y-2">
+          <h2 className="text-lg font-medium text-white">5. Contact Us</h2>
+          <p className="text-zinc-400">
+            For any privacy-related inquiries, please visit our <Link href="/contact" className="text-purple-400 hover:underline">Contact Page</Link>.
+          </p>
+        </section>
+      </div>
+    </div>
   );
 }

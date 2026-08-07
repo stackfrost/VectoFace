@@ -4,55 +4,49 @@
 
 @layer base {
   body {
-    @apply bg-background text-white antialiased font-mono selection:bg-neonMint selection:text-black;
+    background-color: #08080a;
+    color: #f4f4f5;
+    font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     overscroll-behavior-y: none;
+  }
+
+  code, pre, .font-mono {
+    font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 }
 
-/* Cyberpunk Glass Panel with Light Bleed */
-.cyber-panel {
-  @apply bg-surface/90 border border-surfaceBorder rounded-none relative overflow-hidden;
-  box-shadow: 0 0 30px -10px rgba(176, 38, 255, 0.15), inset 0 0 15px rgba(0, 255, 135, 0.05);
+/* Glassmorphism Panels with Neon Glows */
+.glass-panel {
+  background: rgba(18, 18, 22, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-.cyber-panel-mint {
-  @apply bg-surface/90 border border-neonMint/40 rounded-none relative overflow-hidden;
-  box-shadow: 0 0 30px -5px rgba(0, 255, 135, 0.25), inset 0 0 20px rgba(0, 255, 135, 0.1);
+.glass-panel-purple {
+  background: rgba(22, 16, 30, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  box-shadow: 0 0 25px -5px rgba(168, 85, 247, 0.15), inset 0 0 15px rgba(168, 85, 247, 0.05);
 }
 
-.cyber-panel-violet {
-  @apply bg-surface/90 border border-neonViolet/40 rounded-none relative overflow-hidden;
-  box-shadow: 0 0 30px -5px rgba(176, 38, 255, 0.25), inset 0 0 20px rgba(176, 38, 255, 0.1);
+.glass-panel-green {
+  background: rgba(14, 26, 20, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  box-shadow: 0 0 25px -5px rgba(34, 197, 94, 0.15), inset 0 0 15px rgba(34, 197, 94, 0.05);
 }
 
-/* Tactical Corner Crosshairs for Cards */
-.tactical-corners::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 8px;
-  height: 8px;
-  border-top: 2px solid #00FF87;
-  border-left: 2px solid #00FF87;
+/* Ambient Background Ambient Glows */
+.neon-glow-purple {
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
 }
 
-.tactical-corners::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 8px;
-  height: 8px;
-  border-bottom: 2px solid #B026FF;
-  border-right: 2px solid #B026FF;
-}
-
-/* Subtle CRT Scanline overlay effect */
-.crt-overlay {
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%, 
-    rgba(0, 0, 0, 0.25) 50%
-  );
-  background-size: 100% 4px;
+.neon-glow-green {
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
 }
