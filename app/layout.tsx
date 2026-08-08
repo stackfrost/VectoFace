@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 
+// 1. Load Inter for crisp small text
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+// 2. Keep Geist for beautiful big titles
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -14,8 +21,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VectoFace AI - Biometric Facial Diagnostic",
-  description: "AI-powered facial structure and symmetry analysis.",
+  title: "VectoFace AI — Biometric Facial Diagnostic",
+  description: "Instant facial structure, symmetry, and golden ratio analysis powered by neural landmark mapping.",
+  openGraph: {
+    title: "VectoFace AI — Biometric Facial Diagnostic",
+    description: "Get an instant breakdown across 68 facial landmark coordinates and custom softmaxxing protocols.",
+    url: "https://vectoface.me",
+    siteName: "VectoFace AI",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "VectoFace AI — Biometric Facial Diagnostic",
+    description: "AI-powered facial structure and symmetry analysis.",
+  },
 };
 
 export default function RootLayout({
@@ -24,7 +44,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    // 3. Inject all three font variables into the HTML
+    <html lang="en" className={`${inter.variable} ${geistSans.variable} ${geistMono.variable}`}>
       <body className="bg-[#08080a] text-zinc-100 font-sans antialiased selection:bg-purple-900/40 selection:text-emerald-300 flex flex-col min-h-screen relative overflow-x-hidden">
         
         {/* Background Neon Ambient Glows */}

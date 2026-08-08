@@ -24,11 +24,29 @@ export default function UploadPage() {
     if (!file || !hasConsented) return;
     setIsScanning(true);
 
-    // Simulated scan transition - swap with your actual API endpoint upload later
-    setTimeout(() => {
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      // Send the actual file to your backend API
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Analysis failed");
+      }
+
+      // Success! Push to the paywall with the REAL report ID in the URL
+      router.push(`/paywall?reportId=${data.reportId}`);
+    } catch (error) {
+      console.error("Scan error:", error);
+      alert("Analysis failed. Please try a clearer photo or try again in a minute.");
       setIsScanning(false);
-      router.push("/paywall");
-    }, 2500);
+    }
   };
 
   return (

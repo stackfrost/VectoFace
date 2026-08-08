@@ -1,47 +1,58 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Script from "next/script";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function PaywallPage() {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [reportData, setReportData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const reportId = searchParams.get("reportId");
+
+  useEffect(() => {
+    if (!reportId) {
+      setIsLoading(false);
+      return;
+    }
+
+    fetch(`/api/report?id=${reportId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.report) setReportData(data.report);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setIsLoading(false);
+      });
+  }, [reportId]);
 
   const handleRazorpayPayment = async () => {
     setIsProcessing(true);
-
     try {
-      // 1. Ask your backend to create a Razorpay Order
       const res = await fetch("/api/razorpay/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          amount: 9900, // Amount in paise (₹99.00)
-          currency: "INR" 
-        }), 
+        body: JSON.stringify({ amount: 7900, currency: "INR" }), 
       });
       
       const order = await res.json();
+      if (!order || !order.id) throw new Error("Failed to create order");
 
-      if (!order || !order.id) {
-        throw new Error("Failed to create order");
-      }
-
-      // 2. Initialize Razorpay Checkout
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Ensure this is in your .env.local
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
         amount: order.amount,
         currency: order.currency,
         name: "VectoFace AI",
-        description: "Full Biometric Structure Report",
+        description: "Softmaxxing Master Blueprint",
         order_id: order.id,
-        theme: {
-          color: "#a855f7", // Matches your neon purple branding
-        },
+        theme: { color: "#a855f7" },
         handler: async function (response: any) {
-          // 3. Verify Payment on your backend
           const verifyRes = await fetch("/api/razorpay/verify", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -49,127 +60,167 @@ export default function PaywallPage() {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
-              // reportId: "pass-your-actual-report-id-here"
+              reportId: reportId 
             }),
           });
 
           if (verifyRes.ok) {
-            // Redirect to the unlocked report
-            router.push("/full-report?status=unlocked");
+            router.push(`/full-report?reportId=${reportId}`);
           } else {
             alert("Payment verification failed. Contact support.");
             setIsProcessing(false);
           }
         },
-        modal: {
-          ondismiss: function () {
-            setIsProcessing(false);
-          },
-        },
+        modal: { ondismiss: function () { setIsProcessing(false); } },
       };
 
-      // @ts-ignore - Razorpay is loaded via external script
+      // @ts-ignore
       const rzp = new window.Razorpay(options);
       rzp.on("payment.failed", function (response: any) {
         alert(`Payment Failed: ${response.error.description}`);
         setIsProcessing(false);
       });
-      
       rzp.open();
     } catch (error) {
       console.error("Payment trigger error:", error);
-      alert("Something went wrong initiating the payment.");
+      alert("Something went wrong initiating payment.");
       setIsProcessing(false);
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <span className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
+        <p className="text-sm font-mono text-zinc-400">Computing structural geometry...</p>
+      </div>
+    );
+  }
+
+  if (!reportData) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4 text-center px-6">
+        <p className="text-zinc-300">No report found. Please upload a photo first.</p>
+        <Link href="/free-report" className="text-purple-400 hover:underline">← Go back</Link>
+      </div>
+    );
+  }
+
+  const premium = reportData.premiumData || {};
+
   return (
     <>
-      {/* Load Razorpay SDK */}
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
 
-      <div className="max-w-2xl mx-auto px-6 py-10 md:py-14 space-y-8">
-        {/* Header Status */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-5">
-          <div>
-            <span className="text-xs font-mono text-purple-400">
-              Report ID #VF-8821
+      <div className="max-w-2xl mx-auto px-6 py-10 md:py-14 space-y-6">
+        
+        {/* Generous Free Data Section */}
+        <div className="p-6 rounded-2xl glass-panel border-t-2 border-t-emerald-500/50 space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xs font-mono text-emerald-400 uppercase tracking-widest">Base Diagnostics</h2>
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-zinc-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              Scan #{reportData.id.slice(-6).toUpperCase()}
+            </div>
+          </div>
+          
+          {/* Hopium Gap UI */}
+          <div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
+            <div>
+              <span className="text-[10px] font-mono text-zinc-400 uppercase block">Current Score</span>
+              <div className="text-4xl md:text-5xl font-bold text-white mt-1">
+                {reportData.overallScore}<span className="text-sm text-zinc-500 font-light">/100</span>
+              </div>
+            </div>
+            <div className="border-l border-white/10 pl-4">
+              <span className="text-[10px] font-mono text-emerald-400 uppercase block font-semibold">Genetic Potential</span>
+              <div className="text-4xl md:text-5xl font-bold text-emerald-400 mt-1">
+                {reportData.geneticPotential || (reportData.overallScore + 22.4).toFixed(1)}
+              </div>
+            </div>
+          </div>
+
+          {/* Social Hierarchy Trigger */}
+          <div className="flex items-center justify-between text-xs p-3 rounded-lg bg-purple-950/20 border border-purple-500/20">
+            <span className="text-zinc-400">Male Facial Hierarchy Placement:</span>
+            <span className="font-mono font-bold text-purple-300">
+              {reportData.percentile ? `Bottom ${100 - reportData.percentile}%` : "Bottom 42%"}
             </span>
-            <h1 className="text-xl font-medium text-white">
-              Facial Structure Diagnostic
-            </h1>
           </div>
-          <div className="px-2.5 py-1 rounded-full glass-panel-purple text-[11px] font-mono text-purple-300 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#22c55e]" />
-            Scan Complete
-          </div>
-        </div>
 
-        {/* Blurred Preview Card */}
-        <div className="relative p-6 rounded-2xl glass-panel overflow-hidden space-y-6">
-          {/* Unlocked Summary Metrics */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-[#08080a]/60 border border-white/5">
-              <div className="text-[11px] font-mono text-zinc-400">Symmetry Score</div>
-              <div className="text-2xl font-semibold text-white mt-1">88.4 <span className="text-sm text-zinc-500 font-normal">/ 100</span></div>
+          {/* Free Clinical Angles */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="p-3 rounded-xl bg-white/5 text-center">
+              <span className="text-[10px] text-zinc-400 block">Symmetry</span>
+              <span className="text-sm font-mono text-white font-semibold">{reportData.symmetryScore}%</span>
             </div>
-            <div className="p-4 rounded-xl bg-[#08080a]/60 border border-white/5">
-              <div className="text-[11px] font-mono text-zinc-400">Facial Thirds Ratio</div>
-              <div className="text-2xl font-semibold text-white mt-1">1:1.05:0.98</div>
+            <div className="p-3 rounded-xl bg-white/5 text-center">
+              <span className="text-[10px] text-zinc-400 block">Gonial Angle</span>
+              <span className="text-sm font-mono text-white font-semibold">{premium.gonialAngle}°</span>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 text-center">
+              <span className="text-[10px] text-zinc-400 block">Canthal Tilt</span>
+              <span className="text-sm font-mono text-white font-semibold">
+                {premium.canthalTilt > 0 ? '+' : ''}{premium.canthalTilt}°
+              </span>
             </div>
           </div>
 
-          {/* Locked Detailed Section (Blurred Preview) */}
-          <div className="relative pt-2 space-y-3 select-none">
-            <div className="filter blur-md opacity-30 space-y-3">
-              <div className="p-4 bg-[#08080a] border border-white/5 rounded-lg text-sm text-white">
-                Canthal Tilt: Positive (3.2 degrees) - Ideal Range
-              </div>
-              <div className="p-4 bg-[#08080a] border border-white/5 rounded-lg text-sm text-white">
-                Midface Compactness: Optimal Range detected.
-              </div>
-              <div className="p-4 bg-[#08080a] border border-white/5 rounded-lg text-sm text-white">
-                Jawline Definition & Gonial Angle Analysis: 122°
-              </div>
-            </div>
-
-            {/* Paywall Overlay Banner */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-[#08080a]/80 backdrop-blur-sm rounded-xl border border-purple-500/20">
-              <div className="w-10 h-10 rounded-full glass-panel-purple flex items-center justify-center mb-4">
-                <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-white">
-                Unlock Full Biometric Report
-              </h3>
-              <p className="text-xs text-zinc-400 font-light max-w-sm mt-2 leading-relaxed">
-                Get your comprehensive landmark coordinates, personalized grooming recommendations, and complete structural breakdown.
-              </p>
-
-              <div className="mt-6 w-full max-w-xs space-y-3">
-                <button
-                  onClick={handleRazorpayPayment}
-                  disabled={isProcessing}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-emerald-500 hover:opacity-90 disabled:opacity-50 disabled:grayscale text-white font-semibold text-sm transition-all shadow-[0_0_15px_rgba(168,85,247,0.2)] active:scale-[0.98]"
-                >
-                  {isProcessing ? "Connecting to Secure Gateway..." : "Unlock Report — ₹99"}
-                </button>
-                <div className="text-[10px] font-mono text-zinc-500 flex items-center justify-center gap-1.5">
-                  <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                  Secured by Razorpay
-                </div>
-              </div>
-            </div>
+          {/* Teaser Critique Cutoff */}
+          <div className="p-4 rounded-xl bg-[#08080a]/60 border border-red-500/20 relative overflow-hidden">
+            <span className="text-[10px] font-mono text-red-400 uppercase tracking-wider block mb-1">Anatomical Flaw Analysis</span>
+            <p className="text-sm text-zinc-300 italic relative z-10">
+              "{premium.teaserCritique || "Primary structural issues identified in lower third..."} <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-400 to-transparent">causing severe asymmetry...</span>"
+            </p>
+            <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-[#08080a] to-transparent z-20" />
           </div>
         </div>
 
-        {/* Return Link */}
-        <div className="text-center">
-          <Link
-            href="/free-report"
-            className="text-xs font-mono text-zinc-500 hover:text-purple-400 transition-colors"
-          >
+        {/* The Solution Paywall */}
+        <div className="relative rounded-2xl glass-panel-purple overflow-hidden border-t-2 border-t-purple-500/50">
+          <div className="p-6 space-y-4 filter blur-[6px] opacity-40 select-none">
+            <h2 className="text-xs font-mono text-purple-400 uppercase tracking-widest">4-Phase Softmaxxing Blueprint</h2>
+            
+            <div className="space-y-3">
+              <div className="p-3 rounded-xl bg-white/5"><span className="text-xs font-semibold text-white">Phase 1: Craniofacial Debloating Protocol</span></div>
+              <div className="p-3 rounded-xl bg-white/5"><span className="text-xs font-semibold text-white">Phase 2: Ocular Area & Periorbital Optimization</span></div>
+              <div className="p-3 rounded-xl bg-white/5"><span className="text-xs font-semibold text-white">Phase 3: Masseter Hypertrophy & Stubble Line Contour</span></div>
+              <div className="p-3 rounded-xl bg-white/5"><span className="text-xs font-semibold text-white">Phase 4: Dermatological Stratum Resurfacing</span></div>
+            </div>
+          </div>
+
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 text-center bg-[#08080a]/80 backdrop-blur-md">
+            <div className="mb-4 space-y-1">
+              <div className="inline-block px-3 py-1 rounded-full bg-orange-500/20 border border-orange-500/50 text-orange-400 text-[10px] font-bold tracking-wider mb-2 animate-pulse">
+                🇮🇳 INDEPENDENCE DAY FLASH SALE - 80% OFF
+              </div>
+              <div className="flex items-center justify-center gap-3">
+                <span className="text-lg text-zinc-500 line-through decoration-red-500/70 decoration-2 font-medium">₹399</span>
+                <span className="text-4xl font-bold text-white tracking-tight">₹79</span>
+              </div>
+            </div>
+            
+            <h3 className="text-xl font-medium text-white max-w-sm">
+              Bridge your {((reportData.geneticPotential || reportData.overallScore + 22) - reportData.overallScore).toFixed(1)}-point potential gap
+            </h3>
+            <p className="text-sm text-zinc-300 font-light max-w-sm mt-2 leading-relaxed">
+              Unlock the full critique of your flaws, your 4-phase custom softmaxxing protocol, and step-by-step instructions to reach your genetic potential.
+            </p>
+
+            <div className="mt-6 w-full max-w-sm space-y-3">
+              <button
+                onClick={handleRazorpayPayment}
+                disabled={isProcessing}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-orange-600 via-purple-600 to-emerald-500 hover:opacity-90 disabled:opacity-50 disabled:grayscale text-white font-semibold text-sm transition-all shadow-[0_0_20px_rgba(249,115,22,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] active:scale-[0.98]"
+              >
+                {isProcessing ? "Connecting to Gateway..." : "Unlock Master Blueprint — ₹79"}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center pt-2">
+          <Link href="/free-report" className="text-xs font-mono text-zinc-500 hover:text-purple-400 transition-colors">
             ← Upload a different photo
           </Link>
         </div>

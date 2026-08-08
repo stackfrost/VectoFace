@@ -1,197 +1,147 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { ShieldCheck, Terminal, Flame, CheckCircle2, ArrowLeft, RefreshCw, Download } from "lucide-react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
-interface GeminiReport {
-  overallScore: number;
-  tierLabel: string;
-  canthalTilt: string;
-  facialAdiposity: string;
-  jawlineScore: string;
-  comparisonSummary?: string;
-  unlockedObservations: string[];
-  lockedMetrics: string[];
-}
-
-export default function FullReport() {
-  const [report, setReport] = useState<GeminiReport | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function FullReportPage() {
+  const [reportData, setReportData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const reportId = searchParams.get("reportId");
 
   useEffect(() => {
-    const savedData = localStorage.getItem("mog_report_data");
-    if (savedData) {
-      try {
-        setReport(JSON.parse(savedData));
-      } catch (e) {
-        console.error("Failed to parse report data", e);
-      }
+    if (!reportId) {
+      setIsLoading(false);
+      return;
     }
-    setLoading(false);
-  }, []);
 
-  if (loading) {
+    fetch(`/api/report?id=${reportId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.report) {
+          if (!data.report.isPaid) {
+            router.replace(`/paywall?reportId=${reportId}`);
+            return;
+          }
+          setReportData(data.report);
+        }
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setIsLoading(false);
+      });
+  }, [reportId, router]);
+
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-background text-white flex items-center justify-center font-mono crt-overlay">
-        <div className="text-center space-y-3">
-          <Terminal className="w-8 h-8 text-neonMint animate-spin mx-auto" />
-          <p className="text-xs text-neonMint uppercase tracking-widest">[ DECRYPTING FULL REPORT... ]</p>
-        </div>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <span className="w-8 h-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
+        <p className="text-sm font-mono text-zinc-400">Decrypting Master Blueprint...</p>
       </div>
     );
   }
 
-  const score = report?.overallScore ?? 4.8;
-  const tier = report?.tierLabel ?? "LTN / SUB-5";
+  if (!reportData) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4 text-center px-6">
+        <p className="text-zinc-300">No report found or access denied.</p>
+        <Link href="/free-report" className="text-purple-400 hover:underline">← Upload a photo</Link>
+      </div>
+    );
+  }
+
+  const premium = reportData.premiumData || {};
 
   return (
-    <main className="max-w-md mx-auto min-h-[100dvh] bg-background text-white flex flex-col justify-between p-6 font-mono crt-overlay relative overflow-hidden">
-      
-      {/* Background Orbs */}
-      <div className="absolute top-[-10%] right-[-10%] w-[120%] h-[35%] bg-neonMint/20 blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-[-5%] left-[-10%] w-[120%] h-[35%] bg-neonViolet/20 blur-[100px] pointer-events-none" />
-
-      <div className="z-10 space-y-6">
-        
-        {/* Header Badge & PDF Download Button */}
-        <div className="flex items-center justify-between border-b border-surfaceBorder pb-3">
-          <div className="inline-flex items-center gap-1.5 text-[10px] text-neonMint font-bold uppercase tracking-widest">
-            <ShieldCheck className="w-3.5 h-3.5" /> UNLOCKED FULL DIAGNOSTIC
+    <div className="max-w-3xl mx-auto px-6 py-10 md:py-16 space-y-8">
+      {/* Top Banner */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+        <div>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full glass-panel-green text-[10px] font-mono text-emerald-300 mb-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            UNLOCKED • MASTER BLUEPRINT
           </div>
-          <button
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-1 bg-surface border border-neonMint/40 text-neonMint text-[10px] px-2.5 py-1 uppercase tracking-wider hover:bg-neonMint hover:text-black transition-colors"
-          >
-            <Download className="w-3 h-3" /> SAVE PDF
-          </button>
+          <h1 className="text-2xl md:text-3xl font-medium text-white">
+            Full Biometric & Softmaxxing Protocol
+          </h1>
+        </div>
+        <div className="text-xs font-mono text-zinc-400">
+          ID: <span className="text-purple-400">#{reportData.id.slice(-6).toUpperCase()}</span>
+        </div>
+      </div>
+
+      {/* Scores Overview */}
+      <div className="p-6 md:p-8 rounded-2xl glass-panel border-t-2 border-t-emerald-500 space-y-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+          <div className="p-3 bg-white/5 rounded-xl">
+            <span className="text-[10px] text-zinc-400 block">Current Score</span>
+            <span className="text-2xl font-bold text-white">{reportData.overallScore}</span>
+          </div>
+          <div className="p-3 bg-emerald-950/30 border border-emerald-500/30 rounded-xl">
+            <span className="text-[10px] text-emerald-400 block">Peak Potential</span>
+            <span className="text-2xl font-bold text-emerald-400">{reportData.geneticPotential}</span>
+          </div>
+          <div className="p-3 bg-white/5 rounded-xl">
+            <span className="text-[10px] text-zinc-400 block">Symmetry</span>
+            <span className="text-2xl font-bold text-white">{reportData.symmetryScore}%</span>
+          </div>
+          <div className="p-3 bg-white/5 rounded-xl">
+            <span className="text-[10px] text-zinc-400 block">Facial Thirds</span>
+            <span className="text-xs font-mono text-white mt-2 block">{reportData.facialThirds}</span>
+          </div>
         </div>
 
-        {/* Progression / Comparison Alert (Shows if repeat scan) */}
-        {report?.comparisonSummary && (
-          <div className="cyber-panel p-3 tactical-corners border-neonMint/60 bg-neonMint/10 text-xs">
-            <div className="text-[10px] text-neonMint font-bold uppercase tracking-widest flex items-center gap-1 mb-1">
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: "12s" }} /> RE-EVALUATION DELTA
-            </div>
-            <p className="text-gray-200 text-[11px] font-semibold">
-              {report.comparisonSummary}
-            </p>
+        {/* Full Critique */}
+        {premium.teaserCritique && (
+          <div className="p-4 rounded-xl bg-purple-950/20 border border-purple-500/20 text-sm text-zinc-300 leading-relaxed">
+            <span className="text-xs font-mono text-purple-400 block mb-1 uppercase">Full Structural Critique</span>
+            "{premium.teaserCritique}"
           </div>
         )}
-
-        {/* Hero Rating Banner */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="cyber-panel p-6 text-center tactical-corners border-neonMint relative"
-        >
-          <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">
-            FINAL AESTHETIC EVALUATION
-          </div>
-          
-          <h1 className="text-4xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-neonMint via-white to-neonViolet uppercase">
-            {tier}
-          </h1>
-
-          <div className="mt-3 inline-block bg-black/80 border border-neonMint px-4 py-1.5 text-sm text-neonMint font-bold tracking-widest uppercase shadow-glow-mint">
-            OVERALL SCORE: {score} / 10
-          </div>
-        </motion.div>
-
-        {/* Deep Structural Metrics */}
-        <div className="space-y-3">
-          <div className="text-[10px] text-neonMint font-bold uppercase tracking-widest flex items-center gap-1">
-            <Flame className="w-3.5 h-3.5" /> STRUCTURAL ANALYSIS BREAKDOWN
-          </div>
-
-          <div className="space-y-2 text-xs">
-            <div className="bg-surface/80 border border-surfaceBorder p-3 space-y-1">
-              <div className="flex justify-between text-neonMint font-bold">
-                <span>1. EYE & PERIORBITAL AREA</span>
-                <span className="text-gray-400">{report?.canthalTilt || "Neutral"}</span>
-              </div>
-              <p className="text-gray-300 text-[11px]">
-                Canthal tilt orientation impacts alertness and facial dimorphism. Focus on sleep hygiene and upper eyelid exposure management.
-              </p>
-            </div>
-
-            <div className="bg-surface/80 border border-surfaceBorder p-3 space-y-1">
-              <div className="flex justify-between text-neonMint font-bold">
-                <span>2. JAWLINE & BONE STRUCTURE</span>
-                <span className="text-gray-400">Gonial Angle ~128°</span>
-              </div>
-              <p className="text-gray-300 text-[11px]">
-                {report?.jawlineScore || "Gonial angle indicates moderate chin projection with soft ramus definition."}
-              </p>
-            </div>
-
-            <div className="bg-surface/80 border border-surfaceBorder p-3 space-y-1">
-              <div className="flex justify-between text-neonMint font-bold">
-                <span>3. FACIAL ADIPOSITY & WATER RETENTION</span>
-                <span className="text-alertRed font-bold">HIGH PRIORITY</span>
-              </div>
-              <p className="text-gray-300 text-[11px]">
-                {report?.facialAdiposity || "Subcutaneous water layer obscuring cheekbone definition."}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Soft-Maxxing Protocols */}
-        <div className="cyber-panel p-4 tactical-corners border-neonViolet/50 space-y-3">
-          <div className="text-[10px] text-neonViolet font-bold uppercase tracking-widest flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5" /> RECALIBRATED PROTOCOL
-          </div>
-
-          <ul className="space-y-2 text-xs text-gray-300">
-            <li className="flex items-start gap-2">
-              <span className="text-neonMint font-bold">•</span>
-              <span><strong>Potassium/Sodium Flush:</strong> Target 4,000mg potassium daily to eliminate facial puffiness within 72 hours.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-neonMint font-bold">•</span>
-              <span><strong>Bodyfat Target:</strong> Reduce bodyfat percentage down to 12–14% to maximize cheekbone hollows.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-neonMint font-bold">•</span>
-              <span><strong>Grooming Alignment:</strong> Mid-fade or textured crop to visually balance upper midface width.</span>
-            </li>
-          </ul>
-        </div>
-
-        {/* Repeat Scan Upsell Banner */}
-        <div className="cyber-panel p-4 tactical-corners border-neonMint/40 bg-black/60 space-y-2">
-          <div className="text-[10px] text-neonMint font-bold uppercase tracking-widest flex items-center justify-between">
-            <span>// 14-DAY RE-EVALUATION PROTOCOL</span>
-            <span className="text-neonViolet">ASCENSION TRACKER</span>
-          </div>
-          <p className="text-[11px] text-gray-300">
-            Run this routine for 14 days, then upload a new selfie to track facial adiposity drops and side-by-side progression.
-          </p>
-          <button
-            onClick={() => {
-              window.location.href = "/";
-            }}
-            className="w-full bg-neonMint/20 border border-neonMint text-neonMint font-bold text-xs py-2.5 uppercase tracking-wider hover:bg-neonMint hover:text-black transition-colors flex items-center justify-center gap-2 mt-2"
-          >
-            <RefreshCw className="w-3.5 h-3.5" /> RUN PROGRESS RE-CHECK
-          </button>
-        </div>
-
       </div>
 
-      {/* Back Button */}
-      <div className="z-10 pt-4 pb-2">
-        <button
-          onClick={() => {
-            window.location.href = "/";
-          }}
-          className="w-full bg-surface border border-surfaceBorder text-gray-400 font-bold text-xs py-3 uppercase tracking-wider hover:text-white flex items-center justify-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" /> BACK TO SCANNER
-        </button>
+      {/* 4 Unlocked Protocol Phases */}
+      <div className="space-y-6">
+        <h2 className="text-sm font-mono text-zinc-400 uppercase tracking-widest">Custom Softmaxxing Roadmap</h2>
+
+        {/* Phase 1 */}
+        <div className="p-6 rounded-2xl glass-panel space-y-2 border-l-4 border-l-purple-500">
+          <span className="text-xs font-mono text-purple-400 uppercase">Phase 1 • Craniofacial Debloating</span>
+          <h3 className="text-base font-semibold text-white">Fluid Retention & Tissue Flushing</h3>
+          <p className="text-sm text-zinc-300 leading-relaxed font-light">{premium.phase1}</p>
+        </div>
+
+        {/* Phase 2 */}
+        <div className="p-6 rounded-2xl glass-panel space-y-2 border-l-4 border-l-emerald-500">
+          <span className="text-xs font-mono text-emerald-400 uppercase">Phase 2 • Ocular Area Optimization</span>
+          <h3 className="text-base font-semibold text-white">Periorbital & Brow Architecture</h3>
+          <p className="text-sm text-zinc-300 leading-relaxed font-light">{premium.phase2}</p>
+        </div>
+
+        {/* Phase 3 */}
+        <div className="p-6 rounded-2xl glass-panel space-y-2 border-l-4 border-l-orange-500">
+          <span className="text-xs font-mono text-orange-400 uppercase">Phase 3 • Lower Third Hypertrophy</span>
+          <h3 className="text-base font-semibold text-white">Masseter Activation & Stubble Contouring</h3>
+          <p className="text-sm text-zinc-300 leading-relaxed font-light">{premium.phase3}</p>
+        </div>
+
+        {/* Phase 4 */}
+        <div className="p-6 rounded-2xl glass-panel space-y-2 border-l-4 border-l-blue-500">
+          <span className="text-xs font-mono text-blue-400 uppercase">Phase 4 • Dermatological Resurfacing</span>
+          <h3 className="text-base font-semibold text-white">Stratum Corneum & Skin Tone Clarity</h3>
+          <p className="text-sm text-zinc-300 leading-relaxed font-light">{premium.phase4}</p>
+        </div>
       </div>
 
-    </main>
+      {/* Return Link */}
+      <div className="text-center pt-4">
+        <Link href="/free-report" className="text-xs font-mono text-zinc-500 hover:text-purple-400 transition-colors">
+          ← Upload another photo for diagnostic
+        </Link>
+      </div>
+    </div>
   );
 }

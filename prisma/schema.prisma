@@ -4,9 +4,13 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-// 1. Meme Page Admin / Affiliate Account
+// ==========================================
+// 1. MEME PAGE ADMIN / AFFILIATE TRACKING
+// ==========================================
+
 model Affiliate {
   id              String       @id @default(cuid())
   refCode         String       @unique // e.g., "SIGMA_MEMES"
@@ -20,7 +24,6 @@ model Affiliate {
   conversions     Conversion[]
 }
 
-// 2. Individual Conversion Record
 model Conversion {
   id                String     @id @default(cuid())
   affiliateId       String?
@@ -33,7 +36,33 @@ model Conversion {
   createdAt         DateTime   @default(now())
 }
 
-// 3. User Scan Report Storage
+// ==========================================
+// 2. THE NEW SOFTMAXXING ENGINE (ACTIVE)
+// ==========================================
+
+model ScanReport {
+  id                String   @id @default(cuid())
+  isPaid            Boolean  @default(false)
+  paymentId         String?  // Populated once Razorpay succeeds
+  
+  // Free Preview Data (The Bait)
+  overallScore      Float
+  geneticPotential  Float?   // The hopium gap
+  percentile        Int?     // The social hierarchy trigger
+  symmetryScore     Float
+  facialThirds      String
+  
+  // Locked Premium Data (The Cure - Stored securely as JSON)
+  premiumData       Json
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// ==========================================
+// 3. LEGACY REPORT STORAGE (BACKUP)
+// ==========================================
+
 model UserReport {
   id           String   @id @default(cuid())
   deviceId     String   

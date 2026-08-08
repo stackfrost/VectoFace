@@ -6,18 +6,25 @@
   body {
     background-color: #08080a;
     color: #f4f4f5;
-    font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    /* Use Inter for all small/body text */
+    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility; /* CRITICAL: Fixes pixelation on small text */
     overscroll-behavior-y: none;
   }
 
+  /* Force all Titles to keep the Geist AI aesthetic */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-geist-sans), sans-serif;
+  }
+
   code, pre, .font-mono {
-    font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
   }
 }
 
-/* Glassmorphism Panels with Neon Glows */
+/* Glassmorphism Panels with Neon Glows (Keep your existing glass css below this) */
 .glass-panel {
   background: rgba(18, 18, 22, 0.55);
   backdrop-filter: blur(16px);
@@ -42,7 +49,6 @@
   box-shadow: 0 0 25px -5px rgba(34, 197, 94, 0.15), inset 0 0 15px rgba(34, 197, 94, 0.05);
 }
 
-/* Ambient Background Ambient Glows */
 .neon-glow-purple {
   background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
 }
