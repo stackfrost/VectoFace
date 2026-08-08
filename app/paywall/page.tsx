@@ -1,11 +1,11 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import Script from "next/script";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function PaywallPage() {
+function PaywallContent() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [reportData, setReportData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -114,7 +114,6 @@ export default function PaywallPage() {
 
       <div className="max-w-2xl mx-auto px-6 py-10 md:py-14 space-y-6">
         
-        {/* Generous Free Data Section */}
         <div className="p-6 rounded-2xl glass-panel border-t-2 border-t-emerald-500/50 space-y-6">
           <div className="flex justify-between items-center">
             <h2 className="text-xs font-mono text-emerald-400 uppercase tracking-widest">Base Diagnostics</h2>
@@ -124,7 +123,6 @@ export default function PaywallPage() {
             </div>
           </div>
           
-          {/* Hopium Gap UI */}
           <div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
             <div>
               <span className="text-[10px] font-mono text-zinc-400 uppercase block">Current Score</span>
@@ -140,7 +138,6 @@ export default function PaywallPage() {
             </div>
           </div>
 
-          {/* Social Hierarchy Trigger */}
           <div className="flex items-center justify-between text-xs p-3 rounded-lg bg-purple-950/20 border border-purple-500/20">
             <span className="text-zinc-400">Male Facial Hierarchy Placement:</span>
             <span className="font-mono font-bold text-purple-300">
@@ -148,7 +145,6 @@ export default function PaywallPage() {
             </span>
           </div>
 
-          {/* Free Clinical Angles */}
           <div className="grid grid-cols-3 gap-3">
             <div className="p-3 rounded-xl bg-white/5 text-center">
               <span className="text-[10px] text-zinc-400 block">Symmetry</span>
@@ -166,7 +162,6 @@ export default function PaywallPage() {
             </div>
           </div>
 
-          {/* Teaser Critique Cutoff */}
           <div className="p-4 rounded-xl bg-[#08080a]/60 border border-red-500/20 relative overflow-hidden">
             <span className="text-[10px] font-mono text-red-400 uppercase tracking-wider block mb-1">Anatomical Flaw Analysis</span>
             <p className="text-sm text-zinc-300 italic relative z-10">
@@ -176,11 +171,9 @@ export default function PaywallPage() {
           </div>
         </div>
 
-        {/* The Solution Paywall */}
         <div className="relative rounded-2xl glass-panel-purple overflow-hidden border-t-2 border-t-purple-500/50">
           <div className="p-6 space-y-4 filter blur-[6px] opacity-40 select-none">
             <h2 className="text-xs font-mono text-purple-400 uppercase tracking-widest">4-Phase Softmaxxing Blueprint</h2>
-            
             <div className="space-y-3">
               <div className="p-3 rounded-xl bg-white/5"><span className="text-xs font-semibold text-white">Phase 1: Craniofacial Debloating Protocol</span></div>
               <div className="p-3 rounded-xl bg-white/5"><span className="text-xs font-semibold text-white">Phase 2: Ocular Area & Periorbital Optimization</span></div>
@@ -226,5 +219,18 @@ export default function PaywallPage() {
         </div>
       </div>
     </>
+  );
+}
+
+// Wrapping it in a Suspense boundary for Next.js build compliance
+export default function PaywallPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <span className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
+      </div>
+    }>
+      <PaywallContent />
+    </Suspense>
   );
 }

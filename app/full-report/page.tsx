@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function FullReportPage() {
+function FullReportContent() {
   const [reportData, setReportData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -106,29 +106,21 @@ export default function FullReportPage() {
       {/* 4 Unlocked Protocol Phases */}
       <div className="space-y-6">
         <h2 className="text-sm font-mono text-zinc-400 uppercase tracking-widest">Custom Softmaxxing Roadmap</h2>
-
-        {/* Phase 1 */}
         <div className="p-6 rounded-2xl glass-panel space-y-2 border-l-4 border-l-purple-500">
           <span className="text-xs font-mono text-purple-400 uppercase">Phase 1 • Craniofacial Debloating</span>
           <h3 className="text-base font-semibold text-white">Fluid Retention & Tissue Flushing</h3>
           <p className="text-sm text-zinc-300 leading-relaxed font-light">{premium.phase1}</p>
         </div>
-
-        {/* Phase 2 */}
         <div className="p-6 rounded-2xl glass-panel space-y-2 border-l-4 border-l-emerald-500">
           <span className="text-xs font-mono text-emerald-400 uppercase">Phase 2 • Ocular Area Optimization</span>
           <h3 className="text-base font-semibold text-white">Periorbital & Brow Architecture</h3>
           <p className="text-sm text-zinc-300 leading-relaxed font-light">{premium.phase2}</p>
         </div>
-
-        {/* Phase 3 */}
         <div className="p-6 rounded-2xl glass-panel space-y-2 border-l-4 border-l-orange-500">
           <span className="text-xs font-mono text-orange-400 uppercase">Phase 3 • Lower Third Hypertrophy</span>
           <h3 className="text-base font-semibold text-white">Masseter Activation & Stubble Contouring</h3>
           <p className="text-sm text-zinc-300 leading-relaxed font-light">{premium.phase3}</p>
         </div>
-
-        {/* Phase 4 */}
         <div className="p-6 rounded-2xl glass-panel space-y-2 border-l-4 border-l-blue-500">
           <span className="text-xs font-mono text-blue-400 uppercase">Phase 4 • Dermatological Resurfacing</span>
           <h3 className="text-base font-semibold text-white">Stratum Corneum & Skin Tone Clarity</h3>
@@ -136,12 +128,24 @@ export default function FullReportPage() {
         </div>
       </div>
 
-      {/* Return Link */}
       <div className="text-center pt-4">
         <Link href="/free-report" className="text-xs font-mono text-zinc-500 hover:text-purple-400 transition-colors">
           ← Upload another photo for diagnostic
         </Link>
       </div>
     </div>
+  );
+}
+
+// Wrapping it in a Suspense boundary for Next.js build compliance
+export default function FullReportPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <span className="w-8 h-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
+      </div>
+    }>
+      <FullReportContent />
+    </Suspense>
   );
 }
