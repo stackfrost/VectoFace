@@ -211,7 +211,7 @@ function PaywallContent() {
           <div className="space-y-2.5 pt-4 border-t border-white/5">
             <h3 className="text-[10px] font-mono text-red-400 uppercase tracking-widest flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-              Critical Anatomical Bottlenecks
+              Anatomical review
             </h3>
             <div className="space-y-2">
               {redFlags.map((flag: string, idx: number) => (
@@ -225,7 +225,7 @@ function PaywallContent() {
 
           {/* TEASER CRITIQUE */}
           <div className="p-4 rounded-xl bg-[#08080a]/60 border border-red-500/20 relative overflow-hidden">
-            <span className="text-[10px] font-mono text-red-400 uppercase tracking-wider block mb-1">Structural Flaw Analysis</span>
+            <span className="text-[10px] font-mono text-red-400 uppercase tracking-wider block mb-1">Structural Analysis</span>
             <p className="text-sm text-zinc-300 italic relative z-10 leading-relaxed">
               "{premium.teaserCritique || "Subject displays mandibular irregularity and soft-tissue bloat..."} <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-400 to-transparent">which disrupts structural symmetry...</span>"
             </p>

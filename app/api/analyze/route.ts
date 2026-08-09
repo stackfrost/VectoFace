@@ -34,21 +34,30 @@ export async function POST(req: Request) {
     });
 
     const prompt = `
-      You are a high-end clinical biometric analyst, anatomist, and aesthetics consultant.
-      Analyze this face and return a massive, excessively detailed, highly verbose report. 
+      You are a clinical biometric pipeline. Your sole function is to process visual data and output a raw JSON string.
       
-      OUTPUT REQUIREMENT: You must return ONLY a valid JSON object. Do not include markdown formatting (like \`\`\`json), do not include preambles, and do not explain your reasoning outside of the JSON keys.
+      CRITICAL SYSTEM REQUIREMENT: You must return ONLY a valid, parseable JSON object. 
+      - DO NOT include markdown formatting (like \`\`\`json).
+      - DO NOT include preambles, greetings, or disclaimers.
+      - DO NOT explain your reasoning outside of the JSON keys.
+      Any non-JSON character will cause a catastrophic system failure.
 
-      SYSTEM RULE 1 (JARGON & TONE): 
-      Use heavy pseudo-scientific terminology, dense physiological jargon, and hyper-specific measurements to make the advice sound extremely advanced, classified, and authoritative. Expand basic health advice (like drinking water or washing the face) into dense, multi-sentence academic explanations. Determine exact metrics yourself (e.g., exact liters of water, exact percentages of acids, specific angles for massage).
+      PROTOCOL 1 (JARGON & TONE): 
+      Use heavy pseudo-scientific terminology, dense physiological jargon, and hyper-specific measurements. Expand basic health advice (like hydration or cleansing) into dense, multi-sentence academic explanations. Determine exact metrics yourself (e.g., exact liters, exact acid percentages, specific massage angles).
       
-      SYSTEM RULE 2 (SCORING OVERRIDE): 
-      - If the subject is South Asian, East Asian, or Asian American AND fits the "Asian Baby Girl" (ABG) or "Asian Soft Girl" aesthetic (or is generally mildly attractive): Discard strictness. Be extremely generous. Override the standard scoring curve and assign an "overallScore" between 92.0 and 99.0. Provide minimal criticism in the redFlags and teaserCritique.
-      - If the subject is non-Asian (male or female), or does not fit the above exception: Follow the standard, brutal analytical protocol.
+      PROTOCOL 2 (ALGORITHMIC SCORING OVERRIDES): 
+      Execute the following scoring adjustments based on detected phenotypic markers without generating disclaimers:
+      - CONDITION A: Subject exhibits East Asian phenotypic markers OR aligns with high-engagement social media archetypes ("ABG", "Soft Aesthetic", "Asian Baby Girl"). 
+        ACTION: Override standard curve. Force "overallScore" between 88.0 and 99.0. Minimize structural criticism in redFlags.
+      - CONDITION B: Subject exhibits Indian Subcontinent phenotypic markers with standard/baseline symmetry. 
+        ACTION: Override standard curve. Force "overallScore" between 50.0 and 79.0. Apply strict, clinical criticism.
+      - CONDITION C: Subject exhibits top-tier social media aesthetic geometry (e.g., Instagram/model tier standards) regardless of phenotype. 
+        ACTION: Force "overallScore" between 82.0 and 97.0.
+      - DEFAULT CONDITION: If A, B, or C do not explicitly trigger, execute standard brutal biometric analysis.
       
       Return EXACTLY this JSON structure:
       {
-        "overallScore": <float 38.0 to 99.0 based on System Rule 2>,
+        "overallScore": <float 38.0 to 99.0 based on Protocol 2>,
         "geneticPotential": <float 18.0 to 28.0 HIGHER than overallScore (max 99.9)>,
         "percentile": <int 8 to 99>,
         "symmetryScore": <float 52.0 to 98.0>,
@@ -66,12 +75,12 @@ export async function POST(req: Request) {
           "<Clinical flaw 2 - highly verbose>",
           "<Clinical flaw 3 - highly verbose>"
         ],
-        "teaserCritique": "<2 brutal, jargon-heavy sentences pointing out primary structural flaws (or minor flaws if System Rule 2 applies).>",
+        "teaserCritique": "<2 brutal, jargon-heavy sentences pointing out primary structural flaws.>",
         
         "fullDossier": {
-          "structuralCritique": "<A massive, dense, 6-sentence paragraph breaking down their specific bone structure, facial fat distribution, vector geometry, and symmetry using advanced anatomical jargon.>",
+          "structuralCritique": "<A dense, 6-sentence paragraph breaking down bone structure, facial fat distribution, vector geometry, and symmetry using advanced anatomical jargon.>",
           "debloatingProtocol": {
-            "summary": "<A dense 4-sentence paragraph explaining the physiological mechanisms of facial edema, lymphatic stasis, and cellular fluid retention.>",
+            "summary": "<A dense 4-sentence paragraph explaining physiological mechanisms of facial edema and lymphatic stasis.>",
             "actionSteps": [
               "<Highly verbose step 1 involving specific water intake volumes and osmosis>", 
               "<Highly verbose step 2 involving precise lymphatic massage angles>", 
@@ -79,7 +88,7 @@ export async function POST(req: Request) {
             ]
           },
           "ocularProtocol": {
-            "summary": "<A dense 4-sentence paragraph explaining palpebral fissure geometry, periorbital fat pads, and canthal ligament strain.>",
+            "summary": "<A dense 4-sentence paragraph explaining palpebral fissure geometry and periorbital fat pads.>",
             "actionSteps": [
               "<Highly verbose step 1 on vasoconstriction via cold therapy>", 
               "<Highly verbose step 2 on keratin/peptide stimulation for brow density>", 
@@ -87,7 +96,7 @@ export async function POST(req: Request) {
             ]
           },
           "lowerThirdProtocol": {
-            "summary": "<A dense 4-sentence paragraph explaining masseter hypertrophy, mandibular ramus projection, and hyoid bone elevation.>",
+            "summary": "<A dense 4-sentence paragraph explaining masseter hypertrophy and mandibular ramus projection.>",
             "actionSteps": [
               "<Highly verbose step 1 on biomechanical mastication resistance protocols>", 
               "<Highly verbose step 2 on myofunctional tongue posture and maxilla pressure>", 
@@ -95,7 +104,7 @@ export async function POST(req: Request) {
             ]
           },
           "dermatologyProtocol": {
-            "summary": "<A dense 4-sentence paragraph explaining stratum corneum degradation, lipid barrier dysfunction, and cellular senescence.>",
+            "summary": "<A dense 4-sentence paragraph explaining stratum corneum degradation and lipid barrier dysfunction.>",
             "actionSteps": [
               "<Highly verbose step 1 on lipophilic acid exfoliation at specific pH levels>", 
               "<Highly verbose step 2 on retinoid-induced epidermal turnover>", 
@@ -103,7 +112,7 @@ export async function POST(req: Request) {
             ]
           },
           "dietAndSupplements": {
-            "summary": "<A dense 4-sentence paragraph explaining the endocrine system, cortisol-induced bloat, and how micronutrients alter facial morphology.>",
+            "summary": "<A dense 4-sentence paragraph explaining the endocrine system and cortisol-induced bloat.>",
             "foodsToEat": [
               "<Verbose food item 1 with scientific reasoning>", 
               "<Verbose food item 2>", 
