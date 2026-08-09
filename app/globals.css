@@ -56,3 +56,45 @@
 .neon-glow-green {
   background: radial-gradient(circle, rgba(34, 197, 94, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
 }
+
+/* Print Styles for PDF Export */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Hide navigation, buttons, and decorative elements */
+  nav,
+  footer,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Force clean white panels with dark borders */
+  .glass-panel,
+  .glass-panel-purple,
+  .glass-panel-green {
+    background: #ffffff !important;
+    border: 1px solid #e4e4e7 !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Ensure text is crisp black */
+  h1, h2, h3, p, span, li, div {
+    color: #000000 !important;
+    text-shadow: none !important;
+  }
+
+  /* Clean section breaks for multi-page output */
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+}
