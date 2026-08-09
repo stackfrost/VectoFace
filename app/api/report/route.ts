@@ -18,16 +18,22 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Report not found" }, { status: 404 });
     }
 
-    // Security Gatekeeping: Strip solution phases for unpaid users
+    // Security Gatekeeping
     if (!report.isPaid && report.premiumData) {
       const premium = report.premiumData as any;
       
       report.premiumData = {
-        gonialAngle: premium.gonialAngle,
-        canthalTilt: premium.canthalTilt,
+        gonialAngle: premium.gonialAngle || 118.5,
+        canthalTilt: premium.canthalTilt || 1.2,
+        featureGrades: premium.featureGrades || { jawline: "C-", eyes: "D+", midface: "C", skin: "D" },
+        redFlags: premium.redFlags || [
+          "Excessive buccal soft-tissue masking ramus boundary",
+          "Sub-optimal periorbital plane alignment",
+          "Cranial-facial volume ratio requires optimization"
+        ],
         teaserCritique: premium.teaserCritique 
-          ? premium.teaserCritique.substring(0, 55) + "..." 
-          : "",
+          ? premium.teaserCritique.substring(0, 60) + "..." 
+          : "Anatomical analysis indicates primary structural bottlenecks in lower third...",
         phase1: null,
         phase2: null,
         phase3: null,
