@@ -1,7 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import BiometricScanner from "@/components/BiometricScanner";
+import { usePostHog } from "posthog-js/react";
 
 export default function HomePage() {
+  const posthog = usePostHog();
+
   return (
     <div className="max-w-6xl mx-auto px-6 py-12 md:py-20 flex flex-col md:flex-row items-center justify-between gap-12">
       {/* Left Content Column */}
@@ -22,10 +27,11 @@ export default function HomePage() {
           Get an instant breakdown across 68 facial landmark coordinates. Calculate Golden Ratio harmony, jawline angles, and midface proportions.
         </p>
 
-        {/* Updated Full-Width Frosted CTA */}
+        {/* Updated Full-Width Frosted CTA with Event Tracking */}
         <div className="pt-4 flex flex-col items-center w-full max-w-md">
           <Link
             href="/free-report"
+            onClick={() => posthog.capture("homepage_cta_clicked")}
             className="w-full block text-center py-4 rounded-xl glass-panel-purple border border-purple-500/30 text-white font-semibold text-sm transition-all hover:bg-purple-700/30 shadow-[0_0_30px_rgba(168,85,247,0.25)] hover:shadow-[0_0_45px_rgba(168,85,247,0.45)] active:scale-[0.98]"
           >
             Upload Photo

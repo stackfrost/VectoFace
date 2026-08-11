@@ -52,7 +52,7 @@ export async function POST(req: Request) {
       - CONDITION B: Subject exhibits Indian Subcontinent phenotypic markers with standard/baseline symmetry. 
         ACTION: Override standard curve. Force "overallScore" between 50.0 and 79.0. Apply strict, clinical criticism.
       - CONDITION C: Subject exhibits top-tier social media aesthetic geometry (e.g., Instagram/model tier standards) regardless of phenotype. 
-        ACTION: Force "overallScore" between 82.0 and 97.0.
+        ACTION: Force "overallScore" between 82.0 and 99.0.
       - DEFAULT CONDITION: If A, B, or C do not explicitly trigger, execute standard brutal biometric analysis.
       
       Return EXACTLY this JSON structure:

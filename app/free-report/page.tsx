@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { usePostHog } from "posthog-js/react";
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -11,6 +12,9 @@ export default function UploadPage() {
   const [hasConsented, setHasConsented] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  
+  // Initialize PostHog
+  const posthog = usePostHog();
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
@@ -23,6 +27,9 @@ export default function UploadPage() {
   const handleAnalyze = async () => {
     if (!file || !hasConsented) return;
     setIsScanning(true);
+
+    // Track: User initiated the upload process
+    posthog.capture("photo_upload_started");
 
     try {
       const formData = new FormData();
@@ -40,10 +47,21 @@ export default function UploadPage() {
         throw new Error(data.error || "Analysis failed");
       }
 
+      // Track: AI successfully processed the image
+      posthog.capture("photo_upload_success", { 
+        reportId: data.reportId 
+      });
+
       // Success! Push to the paywall with the REAL report ID in the URL
       router.push(`/paywall?reportId=${data.reportId}`);
     } catch (error) {
       console.error("Scan error:", error);
+      
+      // Track: API failure or timeout
+      posthog.capture("photo_upload_failed", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+
       alert("Analysis failed. Please try a clearer photo or try again in a minute.");
       setIsScanning(false);
     }

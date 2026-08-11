@@ -9,27 +9,52 @@ const razorpay = new Razorpay({
 
 export async function POST(req: Request) {
   try {
-    const { refCode } = await req.json();
+    const body = await req.json();
+    const { refCode, couponCode, amount: tamperedAmount } = body;
 
-    // 1. Server-side price resolution
-    let finalAmountInPaise = 14900; // Default ₹149
+    // Price Constants in Paise
+    const PENALTY_PRICE = 39900;   // ₹399 Tamper Penalty
+    const BASE_PRICE = 7900;        // ₹79 Standard Price
+    const DISCOUNT_PRICE = 5900;    // ₹59 Discounted Price
 
-    if (refCode) {
-      const cleanCode = refCode.trim().toUpperCase();
-      const affiliate = await db.affiliate.findUnique({
-        where: { refCode: cleanCode },
-      });
+    let finalAmountInPaise: number;
 
-      if (affiliate) {
-        finalAmountInPaise = 5900; // Discounted ₹59
+    // 1. TAMPER DETECTION: If client attempts to send ANY amount parameter, issue penalty
+    if (tamperedAmount !== undefined && tamperedAmount !== null) {
+      console.warn(`[SECURITY ALERT] Request payload contained client amount: ${tamperedAmount}. Applying penalty rate.`);
+      finalAmountInPaise = PENALTY_PRICE;
+    } else {
+      // 2. Legitimate server-side price calculation
+      finalAmountInPaise = BASE_PRICE;
+
+      const codeToValidate = couponCode || refCode;
+      if (codeToValidate) {
+        const cleanCode = String(codeToValidate).trim().toUpperCase();
+
+        const coupon = await db.coupon.findUnique({
+          where: { code: cleanCode },
+        });
+
+        if (
+          coupon &&
+          coupon.isActive &&
+          (coupon.isUnlimited || !coupon.maxUses || coupon.currentUses < coupon.maxUses)
+        ) {
+          finalAmountInPaise = DISCOUNT_PRICE;
+        }
       }
     }
 
-    // 2. Create Razorpay Order with server-mandated amount
+    // 3. Create Razorpay Order with server-enforced amount
     const options = {
       amount: finalAmountInPaise,
       currency: "INR",
       receipt: `rcpt_${Date.now()}`,
+      notes: {
+        refCode: refCode || null,
+        appliedCoupon: couponCode || null,
+        isPenalized: finalAmountInPaise === PENALTY_PRICE ? "true" : "false",
+      },
     };
 
     const order = await razorpay.orders.create(options);

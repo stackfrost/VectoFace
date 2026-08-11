@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  
 }
 
 // ==========================================
@@ -22,6 +21,7 @@ model Affiliate {
   createdAt       DateTime     @default(now())
 
   conversions     Conversion[]
+  coupons         Coupon[]
 }
 
 model Conversion {
@@ -36,27 +36,43 @@ model Conversion {
   createdAt         DateTime   @default(now())
 }
 
+model Coupon {
+  id           String     @id @default(cuid())
+  code         String     @unique // e.g., "SIGMA25", "INSTA50"
+  discountPct  Float      // e.g., 25.0 for 25% off
+  isUnlimited  Boolean    @default(true)
+  maxUses      Int?
+  currentUses  Int        @default(0)
+  isActive     Boolean    @default(true)
+
+  // Optional link to an affiliate (if an influencer owns this code)
+  affiliateId  String?
+  affiliate    Affiliate? @relation(fields: [affiliateId], references: [id])
+
+  createdAt    DateTime   @default(now())
+}
+
 // ==========================================
 // 2. THE NEW SOFTMAXXING ENGINE (ACTIVE)
 // ==========================================
 
 model ScanReport {
-  id                String   @id @default(cuid())
-  isPaid            Boolean  @default(false)
-  paymentId         String?  // Populated once Razorpay succeeds
+  id               String   @id @default(cuid())
+  isPaid           Boolean  @default(false)
+  paymentId        String?  // Populated once Razorpay succeeds
   
   // Free Preview Data (The Bait)
-  overallScore      Float
-  geneticPotential  Float?   // The hopium gap
-  percentile        Int?     // The social hierarchy trigger
-  symmetryScore     Float
-  facialThirds      String
+  overallScore     Float
+  geneticPotential Float?   // The hopium gap
+  percentile       Int?     // The social hierarchy trigger
+  symmetryScore    Float
+  facialThirds     String
   
   // Locked Premium Data (The Cure - Stored securely as JSON)
-  premiumData       Json
+  premiumData      Json
 
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 // ==========================================
