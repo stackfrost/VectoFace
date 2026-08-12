@@ -57,22 +57,29 @@ model Coupon {
 // ==========================================
 
 model ScanReport {
-  id               String   @id @default(cuid())
-  isPaid           Boolean  @default(false)
-  paymentId        String?  // Populated once Razorpay succeeds
+  id                String    @id @default(cuid())
+  isPaid            Boolean   @default(false)
+  paymentId         String?   // Populated once Razorpay succeeds
   
+  // Forensic Audit Trail & Payment Tracking
+  paidAt            DateTime?
+  ipAddress         String?
+  userAgent         String?
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+
   // Free Preview Data (The Bait)
-  overallScore     Float
-  geneticPotential Float?   // The hopium gap
-  percentile       Int?     // The social hierarchy trigger
-  symmetryScore    Float
-  facialThirds     String
+  overallScore      Float
+  geneticPotential  Float?   // The hopium gap
+  percentile        Int?     // The social hierarchy trigger
+  symmetryScore     Float
+  facialThirds      String
   
   // Locked Premium Data (The Cure - Stored securely as JSON)
-  premiumData      Json
+  premiumData       Json
 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 // ==========================================
